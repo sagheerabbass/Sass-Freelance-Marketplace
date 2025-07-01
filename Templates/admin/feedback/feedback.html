@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Feedback and Ratings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-10">
+
+<div class="max-w-5xl mx-auto">
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-10">Feedback For All Jobs</h1>
+
+       {% for item in job_feedback_data %}
+<div class="bg-white shadow p-4 rounded mb-4">
+    <h2 class="text-xl font-bold">{{ item.job.title }}</h2>
+    <p>{{ item.job.description }}</p>
+
+    {% if item.already_given %}
+        <p class="text-green-600 mt-2 font-semibold">✅ Feedback already given</p>
+    {% else %}
+        <form method="POST" class="mt-4 space-y-3">
+            {% csrf_token %}
+            <input type="hidden" name="job_id" value="{{ item.job.id }}">
+            
+            <label>Rating (1–5)</label>
+            <input type="number" name="rating" min="1" max="5" required class="w-full p-2 border rounded">
+            
+            <label>Feedback</label>
+            <textarea name="feedback" rows="3" class="w-full p-2 border rounded" required></textarea>
+            
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+                Submit Feedback
+            </button>
+        </form>
+    {% endif %}
+
+    {% for fb in item.feedbacks %}
+        <div class="mt-2 border-t pt-2 text-sm text-gray-700">
+            <strong>Rating:</strong> ⭐ {{ fb.rating }}<br>
+            <strong>By:</strong> {{ fb.Given_by.username }}<br>
+            <strong>Feedback:</strong> {{ fb.feedback }}
+        </div>
+    {% endfor %}
+</div>
+{% endfor %}
+
+
+    <div class="text-center mt-10">
+        <a href="{% url 'admin-dashboard' %}"
+           class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700">
+            ← Back to Dashboard
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

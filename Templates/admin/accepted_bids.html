@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Accepted Bids</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen py-10 px-6">
+
+    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+            All Accepted Bids
+        </h2>
+
+        {% if bids %}
+            <div class="space-y-4">
+                {% for bid in bids %}
+                    <div class="border-l-4 border-green-500 p-4 bg-gray-50 rounded-md shadow">
+                        <p><span class="font-semibold text-gray-700">Job Title:</span> {{ bid.job.title }}</p>
+                        <p><span class="font-semibold text-gray-700">Freelancer:</span> {{ bid.freelancer.username }}</p>
+                        <p><span class="font-semibold text-gray-700">Bid Amount:</span> ${{ bid.bid_amount }}</p>
+                        <p><span class="font-semibold text-gray-700">Delivery Time:</span> {{ bid.delivery_time }}</p>
+                        <p><span class="font-semibold text-gray-700">Message:</span> {{ bid.message }}</p>
+                        {% if bid.accepted_at %}
+                        <p><span class="font-semibold text-gray-700">Accepted At:</span> {{ bid.accepted_at }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center text-gray-600">No accepted bids found.</p>
+        {% endif %}
+
+        <div class="mt-8 text-center">
+            <a href="{% url 'admin-dashboard' %}" class="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

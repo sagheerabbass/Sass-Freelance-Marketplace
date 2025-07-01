@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sidebar: '#1e40af',
+            hover: '#3b82f6',
+            primary: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          },
+          fontFamily: {
+            'sans': ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    /* Simplified sidebar item styling */
+    .sidebar-item {
+      position: relative;
+    }
+    
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      color: white;
+      transition: background-color 0.2s ease;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .sidebar-link:hover {
+      background-color: #3b82f6;
+    }
+    
+    /* Card gradients remain the same */
+    .card-gradient-1 { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
+    .card-gradient-2 { background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%); }
+    .card-gradient-3 { background: linear-gradient(135deg, #10b981 0%, #84cc16 100%); }
+    .card-gradient-4 { background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); }
+    .card-gradient-5 { background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%); }
+    .card-gradient-6 { background: linear-gradient(135deg, #14b8a6 0%, #0ea5e9 100%); }
+    .card-gradient-7 { background: linear-gradient(135deg, #a855f7 0%, #d946ef 100%); }
+    .card-gradient-8 { background: linear-gradient(135deg, #f97316 0%, #eab308 100%); }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-sidebar text-white min-h-screen p-6 flex flex-col justify-between shadow-xl z-10">
+    <div>
+      <!-- Logo/Brand -->
+      <div class="flex items-center justify-center mb-10">
+        <div class="bg-white p-2 rounded-lg shadow-md">
+          <i class="fas fa-briefcase text-blue-600 text-2xl"></i>
+        </div>
+        <h1 class="ml-3 text-xl font-bold">FreelanceHub</h1>
+      </div>
+
+      <!-- Navigation - Simplified structure -->
+      <ul class="space-y-2">
+        <li class="sidebar-item">
+          <a href="{% url 'job_post' %}" class="sidebar-link">
+            <i class="fas fa-bullhorn text-lg w-6 text-center"></i>
+            <span>Post a Job</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'job_list' %}" class="sidebar-link">
+            <i class="fas fa-list-ul text-lg w-6 text-center"></i>
+            <span>Job Listings</span>
+          </a>
+        </li>
+        {% if jobs %}
+        <li class="sidebar-item">
+          <a href="{% url 'feedback-page' %}" class="sidebar-link">
+            <i class="fas fa-star text-lg w-6 text-center"></i>
+            <span>Feedback & Ratings</span>
+          </a>
+        </li>
+        {% endif %}
+        <li class="sidebar-item">
+          <a href="{% url 'view_bids' %}" class="sidebar-link">
+            <i class="fas fa-handshake text-lg w-6 text-center"></i>
+            <span>View Bids</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'accepted_bids' %}" class="sidebar-link">
+            <i class="fas fa-check-circle text-lg w-6 text-center"></i>
+            <span>Accepted Bids</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'accept_milestone' %}" class="sidebar-link">
+            <i class="fas fa-flag-checkered text-lg w-6 text-center"></i>
+            <span>Accept Milestone</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'accepted_milestone' %}" class="sidebar-link">
+            <i class="fas fa-flag-checkered text-lg w-6 text-center"></i>
+            <span>Accepted Milestone</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- User Profile & Logout -->
+    <div class="mb-6">
+      <div class="flex items-center gap-3 mb-6 p-3 bg-blue-900 bg-opacity-30 rounded-lg">
+        <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+          <i class="fas fa-user text-white"></i>
+        </div>
+        <div>
+          <p class="font-medium">{{ request.user.username }}</p>
+          <p class="text-xs text-blue-200">Admin</p>
+        </div>
+      </div>
+      <a href="{% url 'logout' %}" class="flex items-center justify-center gap-2 w-full py-2 px-4 bg-blue-700 hover:bg-blue-600 rounded-lg transition shadow-md">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Top Bar -->
+    <header class="bg-white shadow-sm z-10">
+      <div class="flex items-center justify-between px-8 py-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
+          <p class="text-gray-600">Welcome back, {{ request.user.username }}! 👋</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="relative">
+            <i class="fas fa-bell text-gray-500 text-xl"></i>
+            <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center">3</span>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+            <i class="fas fa-user text-blue-600"></i>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-8 bg-gray-50">
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Cards remain the same -->
+        <div class="card-gradient-1 text-white rounded-xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium opacity-80">Total Jobs</p>
+              <h3 class="text-3xl font-bold mt-2">{{ total_jobs }}</h3>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+              <i class="fas fa-briefcase text-xl"></i>
+            </div>
+          </div>
+          <p class="text-xs mt-4 opacity-80 flex items-center">
+            <span class="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
+            {{ active_jobs }} active jobs
+          </p>
+        </div>
+      <div class="card-gradient-2 text-white rounded-xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium opacity-80">Total Freelancers</p>
+              <h3 class="text-3xl font-bold mt-2">{{ total_freelancers }}</h3>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+              <i class="fas fa-users text-xl"></i>
+            </div>
+          </div>
+          <p class="text-xs mt-4 opacity-80 flex items-center">
+            <span class="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
+            {{ new_freelancers }} total new 
+          </p>
+          </div>
+          <div class="card-gradient-3 text-white rounded-xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium opacity-80">Total Budget</p>
+              <h3 class="text-3xl font-bold mt-2">${{ total_budget }}</h3>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+              <i class="fas fa-wallet text-xl"></i>
+            </div>
+          </div>
+          <p class="text-xs mt-4 opacity-80 flex items-center">
+            <span class="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
+            ${{ avg_budget }} sum of all jobs
+          </p>
+        </div>
+        <div class="card-gradient-4 text-white rounded-xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium opacity-80">Upcoming Deadlines</p>
+              <h3 class="text-3xl font-bold mt-2">{{ upcoming_deadlines|default:"0" }}</h3>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+              <i class="fas fa-calendar-alt text-xl"></i>
+            </div>
+          </div>
+          <p class="text-xs mt-4 opacity-80 flex items-center">
+            <span class="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
+            {{ urgent_deadlines }} Deadlines
+          </p>
+        </div>
+      </div>
+            <!-- Second Row of Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="card-gradient-5 text-white rounded-xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium opacity-80">Average Rating</p>
+              <h3 class="text-3xl font-bold mt-2">{{ average_rating }}</h3>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+              <i class="fas fa-star text-xl"></i>
+            </div>
+          </div>
+          <p class="text-xs mt-4 opacity-80 flex items-center">
+            <span class="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
+            {{ total_reviews }} total reviews
+          </p>
+        </div>
+                <div class="card-gradient-6 text-white rounded-xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium opacity-80">Total Bids</p>
+              <h3 class="text-3xl font-bold mt-2">{{ total_bids }}</h3>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+              <i class="fas fa-gavel text-xl"></i>
+            </div>
+          </div>
+          <p class="text-xs mt-4 opacity-80 flex items-center">
+            <span class="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
+            {{ avg_bids_per_job }}  bids
+          </p>
+        </div>
+                <div class="card-gradient-7 text-white rounded-xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium opacity-80">Accepted Bids</p>
+              <h3 class="text-3xl font-bold mt-2">{{ total_accepted_bids }}</h3>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+              <i class="fas fa-check-circle text-xl"></i>
+            </div>
+          </div>
+          <p class="text-xs mt-4 opacity-80 flex items-center">
+            <span class="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
+            {{ acceptance_rate }} accepted 
+          </p>
+        </div>
+                <div class="card-gradient-8 text-white rounded-xl p-6 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium opacity-80">Feedbacks Given</p>
+              <h3 class="text-3xl font-bold mt-2">{{ total_feedback_ratings }}</h3>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+              <i class="fas fa-comment-alt text-xl"></i>
+            </div>
+          </div>
+          <p class="text-xs mt-4 opacity-80 flex items-center">
+            <span class="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
+            {{ feedback_rate }} total feedback 
+          </p>
+
+    </main>
+        
+        
+
+  <!-- Debugging script - remove in production -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Log all sidebar link clicks
+      document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          console.log('Link clicked:', this.href);
+          // If this logs but page doesn't navigate, there's a JS conflict
+        });
+      });
+      
+      // Check for elements blocking clicks
+      const sidebar = document.querySelector('aside');
+      sidebar.addEventListener('click', function(e) {
+        if (e.target === this) {
+          console.log('Clicked on empty sidebar space');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

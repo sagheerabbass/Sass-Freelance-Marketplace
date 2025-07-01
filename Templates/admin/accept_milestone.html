@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Accepted Milestones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6 text-gray-800">
+
+    <h1 class="text-3xl font-bold mb-6">✅ Completed Milestones</h1>
+
+    <!-- Success Message -->
+    {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Success: </strong>
+                    <span class="block sm:inline">{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if completed_milestone %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for milestone in completed_milestone %}
+                <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+                    <h2 class="text-xl font-semibold mb-2 text-blue-800">{{ milestone.title }}</h2>
+                    <p class="text-gray-700 mb-2">{{ milestone.description }}</p>
+                    <p class="text-sm text-gray-500 mb-2">Due Date: {{ milestone.due_date }}</p>
+
+                    <p class="text-sm mb-3">
+                        <span class="font-medium">Status:</span>
+                        {% if milestone.is_completed %}
+                            ✅ Completed
+                        {% else %}
+                            ⏳ In Progress
+                        {% endif %}
+                        {% if milestone.is_approved_by_client %}
+                            | ✅ Approved by Client
+                        {% endif %}
+                    </p>
+
+                    {% if milestone.is_completed and not milestone.is_approved_by_client %}
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="milestone_id" value="{{ milestone.id }}">
+                            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                                ✅ Approve Milestone
+                            </button>
+                        </form>
+                    {% elif milestone.is_approved_by_client %}
+                        <p class="text-green-600 font-medium">✔ Milestone already approved</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-500 text-lg">No completed milestones found.</p>
+    {% endif %}
+
+    <div class="mt-8 text-center">
+        <a href="{% url 'admin-dashboard' %}" class="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+            Back to Dashboard
+        </a>
+    </div>
+
+</body>
+</html>
