@@ -9,6 +9,8 @@ from django.contrib import messages
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from datetime import datetime,timedelta
+def home(request):
+    return render(request,"home.html")
 def signup(request):
     if request.method == "POST":
         form = signupform(request.POST)
