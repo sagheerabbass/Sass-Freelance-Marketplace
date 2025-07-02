@@ -20,7 +20,7 @@ def signup(request):
     else:
         form = signupform()
 
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'authentication/signup.html', {'form': form})
 def user_login(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -41,7 +41,7 @@ def user_login(request):
         else:
             messages.error(request, "Invalid username or password.")
 
-    return render(request, "login.html")
+    return render(request, "authentication/login.html")
 def custom_logout(request):
     logout(request)  # Log out the user
     return redirect('login')
@@ -60,13 +60,13 @@ def Admin_dashboard(request):
          upcoming_deadlines=Job.objects.filter(deadline__isnull=False).count
          jobs=Job.objects.all()
          recent_activities=[]
-         recent_Bids=Bid.objects.order_by('created_at')[:3]
+         recent_Bids=Bid.objects.order_by('created_at')[:2]
          for bid in recent_Bids:
-             activity = f"Bid for  {bid.job} with deadline {bid.delivery_time} and amount (Rs {bid.bid_amount}) has created on {bid.created_at.strftime('%Y-%m-%d')}}}"
+             activity = f"Bid for  {bid.job.title} with deadline {bid.delivery_time} and amount (Rs {bid.bid_amount}) has created on {bid.created_at.strftime('%Y-%m-%d')}"
              recent_activities.append(activity)
-         recent_jobs=Job.objects.order_by('created_at')[:2]
+         recent_jobs=Job.objects.order_by('created_at')[:1]
          for job in recent_jobs:
-             activity=f"Job {job.title} and description{job.description} and budget{job.budget} has created at {job.created_at}"
+             activity=f"Job {job.title} and description {job.description} and budget  {job.budget} has created at {job.created_at}"
              recent_activities.append(activity)
          return render(request,"admin/admin_dashbaord.html",{
             'total_jobs': total_jobs,
@@ -120,15 +120,15 @@ def Place_bid(request,job_id):
             return redirect('freelancer-dashboard')
     else:
         form=Bidform()
-    return render(request,"freelancer/job_biding.html",{'form':form,'job': job,})
+    return render(request,"freelancer/Job/Place_biding.html",{'form':form,'job': job,})
 def all_bids(request):
     total_bids=Bid.objects.all().filter(freelancer=request.user)
-    return render(request,"freelancer/my_bids.html",{'total_bids':total_bids})
+    return render(request,"freelancer/Job/my_bids.html",{'total_bids':total_bids})
 # view bids
 @login_required
 def view_bids(request):
     bids=Bid.objects.all()
-    return render(request,"admin/view_bids.html",{'bids':bids})
+    return render(request,"admin/bids/view_bids.html",{'bids':bids})
 #Accept Bid
 @login_required
 def accept_bid(request,job_id):
@@ -147,7 +147,7 @@ def accept_bid(request,job_id):
 @login_required
 def accepted_bids(request):
     bids=Bid.objects.filter(accepted_at=True)
-    return render(request, "admin/accepted_bids.html", {'bids': bids})
+    return render(request, "admin/bids/accepted_bids.html", {'bids': bids})
 
 
 # Feedback & Rating
@@ -214,18 +214,18 @@ def accept_milestone(request):
         messages.success(request,"Milestone Approved Successfully!")
 
     completed_milestone=Milestones.objects.all()
-    return render(request,"admin/accept_milestone.html",{'completed_milestone': completed_milestone})
+    return render(request,"admin/milestones/accept_milestone.html",{'completed_milestone': completed_milestone})
 @login_required 
 def accepted_milestone(request):
     all_milestone=Milestones.objects.filter(is_approved_by_client=True)
-    return render (request,"admin/accepted_milestone.html",{'all_milestone':all_milestone})
+    return render (request,"admin/milestones/accepted_milestone.html",{'all_milestone':all_milestone})
 @login_required
 def chat_page(request,job_id):
     if not request.user.is_authenticated:
         return redirect('login')
     job = get_object_or_404(Job, id=job_id)
     messages = Messages.objects.filter(job=job).order_by('timestamp')
-    return render(request,"chatpage.html",{'job':job,'username':request.user.username,"messages": messages})
+    return render(request,"Chat/chatpage.html",{'job':job,'username':request.user.username,"messages": messages})
 # job_completion certificate
 @login_required
 def job_completion_certificate(request,job_id):

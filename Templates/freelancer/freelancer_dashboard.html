@@ -154,7 +154,11 @@
                             <i class="fas fa-gavel"></i>
                             <span>Place Bid</span>
                         </a>
-
+                                                   
+                        <a href="{% url 'chat' job.id %}" 
+                           class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+                            <span>💬 Chat about this Job</span>
+                        </a>
                         <!-- Milestones Link -->
                         {% if job.id %}
                         <a href="{% url 'milestone' job.id %}" 

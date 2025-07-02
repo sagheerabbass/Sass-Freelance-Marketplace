@@ -17,6 +17,9 @@
                 <span>Budget: PKR {{ job.budget }}</span>
                 <span>Deadline: {{ job.deadline }}</span>
             </div>
+            <a href="{% url 'chat' job.id %}" class="mt-2 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+    💬 Chat with Freelancer
+           </a>
         </div>
         {% empty %}
         <p class="text-gray-600">No jobs have been posted yet.</p>

@@ -44,7 +44,7 @@ urlpatterns = [
     path('accepted-milestone/',accepted_milestone,name="accepted_milestone"), # accepted milestone
     #freelancer
     path('freelancer-dashboard/',freelancer_dashboard,name='freelancer-dashboard'),
-    path("chat/<int:job_id>/", chat_page, name="chat-page"), 
+    path("chat/<int:job_id>/", chat_page, name="chat"), 
     path('certificate/<int:job_id>/', job_completion_certificate, name='job_certificate'),
     path('certificate-list/',job_completion_list,name="certificate_list"),
 
