@@ -1,201 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Freelancer Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            overflow: hidden; /* Prevent double scrollbars */
-        }
-        
-        /* Simplified sidebar item styling */
-        .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            color: white;
-            transition: background-color 0.2s ease;
-            position: relative;
-            z-index: 10;
-        }
-        
-        .sidebar-link:hover {
-            background-color: #3b82f6;
-        }
-        
-        /* Ensure main content scrolls */
-        .main-content-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-        
-        .main-content-scrollable {
-            flex: 1;
-            overflow-y: auto;
-        }
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+        overflow: hidden; /* Prevent double scrollbars */
+      }
+
+      /* Simplified sidebar item styling */
+      .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        color: white;
+        transition: background-color 0.2s ease;
+        position: relative;
+        z-index: 10;
+      }
+
+      .sidebar-link:hover {
+        background-color: #3b82f6;
+      }
+
+      /* Ensure main content scrolls */
+      .main-content-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .main-content-scrollable {
+        flex: 1;
+        overflow-y: auto;
+      }
     </style>
-</head>
-<body class="bg-gray-50 min-h-screen flex">
-
+  </head>
+  <body class="bg-gray-50 min-h-screen flex">
     <!-- Sidebar -->
-    <aside class="w-64 bg-blue-900 text-white min-h-screen p-6 flex flex-col justify-between shadow-xl">
-        <div>
-            <!-- Logo/Brand -->
-            <div class="flex items-center justify-center mb-10">
-                <div class="bg-white p-2 rounded-lg shadow-md">
-                    <i class="fas fa-user-tie text-blue-600 text-2xl"></i>
-                </div>
-                <h1 class="ml-3 text-xl font-bold">FreelancerPro</h1>
-            </div>
-
-            <!-- Navigation - Simplified structure -->
-            <ul class="space-y-2">
-                <li>
-                    <a href="{% url 'freelancer-dashboard' %}" 
-                       class="sidebar-link">
-                        <i class="fas fa-tachometer-alt text-lg w-6 text-center"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'my_bid' %}" 
-                       class="sidebar-link">
-                        <i class="fas fa-file-signature text-lg w-6 text-center"></i>
-                        <span>My Bids</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'certificate_list' %}" 
-                       class="sidebar-link">
-                        <i class="fas fa-file-signature text-lg w-6 text-center"></i>
-                        <span>My Certificate</span>
-                    </a>  
-                </li>
-            </ul>
+    <aside
+      class="w-64 bg-blue-900 text-white min-h-screen p-6 flex flex-col justify-between shadow-xl"
+    >
+      <div>
+        <!-- Logo/Brand -->
+        <div class="flex items-center justify-center mb-10">
+          <div class="bg-white p-2 rounded-lg shadow-md">
+            <i class="fas fa-user-tie text-blue-600 text-2xl"></i>
+          </div>
+          <h1 class="ml-3 text-xl font-bold">FreelancerPro</h1>
         </div>
 
-        <!-- User Profile & Logout -->
-        <div class="mb-6">
-            <div class="flex items-center gap-3 mb-6 p-3 bg-blue-900 bg-opacity-30 rounded-lg">
-                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
-                    <i class="fas fa-user text-white"></i>
-                </div>
-                <div>
-                    <p class="font-medium">{{ request.user.username }}</p>
-                    <p class="text-xs text-blue-200">Freelancer</p>
-                </div>
-            </div>
-            <a href="{% url 'logout' %}" class="flex items-center justify-center gap-2 w-full py-2 px-4 bg-blue-700 hover:bg-blue-600 rounded-lg transition shadow-md">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
+        <!-- Navigation - Simplified structure -->
+        <ul class="space-y-2">
+          <li>
+            <a href="{% url 'freelancer-dashboard' %}" class="sidebar-link">
+              <i class="fas fa-tachometer-alt text-lg w-6 text-center"></i>
+              <span>Dashboard</span>
             </a>
+          </li>
+          <li>
+            <a href="{% url 'my_bid' %}" class="sidebar-link">
+              <i class="fas fa-file-signature text-lg w-6 text-center"></i>
+              <span>My Bids</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'certificate_list' %}" class="sidebar-link">
+              <i class="fas fa-file-signature text-lg w-6 text-center"></i>
+              <span>My Certificate</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- User Profile & Logout -->
+      <div class="mb-6">
+        <div
+          class="flex items-center gap-3 mb-6 p-3 bg-blue-900 bg-opacity-30 rounded-lg"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center"
+          >
+            <i class="fas fa-user text-white"></i>
+          </div>
+          <div>
+            <p class="font-medium">{{ request.user.username }}</p>
+            <p class="text-xs text-blue-200">Freelancer</p>
+          </div>
         </div>
+        <a
+          href="{% url 'logout' %}"
+          class="flex items-center justify-center gap-2 w-full py-2 px-4 bg-blue-700 hover:bg-blue-600 rounded-lg transition shadow-md"
+        >
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </div>
     </aside>
 
     <!-- Main Content Container -->
     <div class="main-content-container flex-1">
-        <!-- Top Bar (Fixed) -->
-        <header class="bg-white shadow-sm z-10">
-            <div class="flex items-center justify-between px-8 py-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Available Jobs</h1>
-                    <p class="text-gray-600">Welcome back, {{ request.user.username }}! 👋</p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <i class="fas fa-bell text-gray-500 text-xl"></i>
-                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center">3</span>
-                    </div>
-                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                        <i class="fas fa-user text-blue-600"></i>
-                    </div>
-                </div>
+      <!-- Top Bar (Fixed) -->
+      <header class="bg-white shadow-sm z-10">
+        <div class="flex items-center justify-between px-8 py-4">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-800">Available Jobs</h1>
+            <p class="text-gray-600">
+              Welcome back, {{ request.user.username }}! 👋
+            </p>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="relative">
+              <i class="fas fa-bell text-gray-500 text-xl"></i>
+              <span
+                class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center"
+                >3</span
+              >
             </div>
-        </header>
+            <div
+              class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center"
+            >
+              <i class="fas fa-user text-blue-600"></i>
+            </div>
+          </div>
+        </div>
+      </header>
 
-        <!-- Scrollable Content Area -->
-        <main class="main-content-scrollable p-8 bg-gray-50">
-            <!-- Job Listings Grid -->
-            <div class="grid grid-cols-1 gap-6">
-                {% for job in jobs %}
-                <div class="bg-white rounded-xl p-6 shadow-md border-l-4 border-blue-500 transition hover:shadow-lg">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h2 class="text-xl font-bold text-gray-800">{{ job.title }}</h2>
-                            <p class="text-gray-600 mt-2">{{ job.description }}</p>
-                            
-                            <div class="flex gap-6 mt-4">
-                                <div class="flex items-center text-sm text-gray-500">
-                                    <i class="fas fa-dollar-sign mr-1"></i>
-                                    <span>Budget: ${{ job.budget }}</span>
-                                </div>
-                                <div class="flex items-center text-sm text-gray-500">
-                                    <i class="fas fa-calendar-alt mr-1"></i>
-                                    <span>Deadline: {{ job.deadline }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-4 mt-6">
-                        <!-- Bid Button -->
-                        <a href="{% url 'job_bid' job.id %}" 
-                           class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 transition flex items-center gap-2">
-                            <i class="fas fa-gavel"></i>
-                            <span>Place Bid</span>
-                        </a>
-                                                   
-                        <a href="{% url 'chat' job.id %}" 
-                           class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 transition flex items-center gap-2">
-                            <span>💬 Chat about this Job</span>
-                        </a>
-                        <!-- Milestones Link -->
-                        {% if job.id %}
-                        <a href="{% url 'milestone' job.id %}" 
-                           class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
-                            <i class="fas fa-flag-checkered"></i>
-                            <span>View/Add Milestones</span>
-                        </a>
-                        {% endif %}
-                    </div>
+      <!-- Scrollable Content Area -->
+      <main class="main-content-scrollable p-8 bg-gray-50">
+        <!-- Job Listings Grid -->
+        <div class="grid grid-cols-1 gap-6">
+          {% for job in jobs %}
+          <div
+            class="bg-white rounded-xl p-6 shadow-md border-l-4 border-blue-500 transition hover:shadow-lg"
+          >
+            <div class="flex justify-between items-start">
+              <div>
+                <h2 class="text-xl font-bold text-gray-800">{{ job.title }}</h2>
+                <p class="text-gray-600 mt-2">{{ job.description }}</p>
+
+                <div class="flex gap-6 mt-4">
+                  <div class="flex items-center text-sm text-gray-500">
+                    <i class="fas fa-dollar-sign mr-1"></i>
+                    <span>Budget: ${{ job.budget }}</span>
+                  </div>
+                  <div class="flex items-center text-sm text-gray-500">
+                    <i class="fas fa-calendar-alt mr-1"></i>
+                    <span>Deadline: {{ job.deadline }}</span>
+                  </div>
                 </div>
-                {% empty %}
-                <div class="bg-white rounded-xl p-8 text-center shadow">
-                    <i class="fas fa-folder-open text-4xl text-gray-400 mb-4"></i>
-                    <h3 class="text-xl font-medium text-gray-600">No jobs available at the moment</h3>
-                    <p class="text-gray-500 mt-2">Check back later for new opportunities</p>
-                </div>
-                {% endfor %}
+              </div>
             </div>
-        </main>
+
+            <div class="flex gap-4 mt-6">
+              <!-- Bid Button -->
+              <a
+                href="{% url 'job_bid' job.id %}"
+                class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+              >
+                <i class="fas fa-gavel"></i>
+                <span>Place Bid</span>
+              </a>
+
+              <a
+                href="{% url 'chat' job.id %}"
+                class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+              >
+                <span>💬 Chat about this Job</span>
+              </a>
+              <!-- Milestones Link -->
+              {% if job.id %}
+              <a
+                href="{% url 'milestone' job.id %}"
+                class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+              >
+                <i class="fas fa-flag-checkered"></i>
+                <span>View/Add Milestones</span>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+          {% empty %}
+          <div class="bg-white rounded-xl p-8 text-center shadow">
+            <i class="fas fa-folder-open text-4xl text-gray-400 mb-4"></i>
+            <h3 class="text-xl font-medium text-gray-600">
+              No jobs available at the moment
+            </h3>
+            <p class="text-gray-500 mt-2">
+              Check back later for new opportunities
+            </p>
+          </div>
+          {% endfor %}
+        </div>
+      </main>
     </div>
 
     <!-- Debugging Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Test if links are clickable
-            document.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    console.log('Link clicked:', this.href);
-                });
-            });
-            
-            // Ensure scrolling works
-            const mainContent = document.querySelector('.main-content-scrollable');
-            mainContent.addEventListener('scroll', function() {
-                console.log('Scrolling:', this.scrollTop);
-            });
+      document.addEventListener("DOMContentLoaded", function () {
+        // Test if links are clickable
+        document.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", function (e) {
+            console.log("Link clicked:", this.href);
+          });
         });
+
+        // Ensure scrolling works
+        const mainContent = document.querySelector(".main-content-scrollable");
+        mainContent.addEventListener("scroll", function () {
+          console.log("Scrolling:", this.scrollTop);
+        });
+      });
     </script>
-</body>
+  </body>
 </html>
