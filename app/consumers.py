@@ -1,7 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from .models import Job, Messages, CustomUser
+from .models import Jobs, Messages, User
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -55,11 +55,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def save_message(self, sender_username, job_id, message):
         try:
-            sender = CustomUser.objects.get(username=sender_username)
-            job = Job.objects.get(id=job_id)
+            sender = User.objects.get(username=sender_username)
+            job = Jobs.objects.get(id=job_id)
 
             # Determine receiver
-            receiver = job.freelancer if sender != job.freelancer else CustomUser.objects.filter(is_superuser=True).first()
+            receiver = job.freelancer if sender != job.freelancer else User.objects.filter(is_superuser=True).first()
 
             Messages.objects.create(
                 sender=sender,

@@ -1,23 +1,25 @@
 from app.models import *
 from  django import forms 
-from django.contrib.auth.forms import UserCreationForm
-class signupform(UserCreationForm):
+class Signupform(forms.ModelForm):
     class Meta:
-        model=CustomUser
-        fields=['username','email','password1','password2','role']
+        model=User
+        fields=['name','email','password','role','skills','bio','rating']
+        widegets={
+            'password':forms.PasswordInput(),
+        }
 class jobform(forms.ModelForm):
     class Meta:
-        model=Job
+        model=Jobs
         fields=['title','description','budget','deadline']
 class Bidform(forms.ModelForm):
     class Meta:
-        model=Bid
-        fields=['bid_amount','message','delivery_time']
+        model=Bids
+        fields='__all__'
 class Feedbackform(forms.ModelForm):
     class Meta:
-        model=Feedback
-        fields=['feedback','rating']
-class Milestonesform(forms.ModelForm):
+        model=Ratings
+        fields='__all__'
+class Tasksform(forms.ModelForm):
     class Meta:
-        model=Milestones
-        fields=['title','description','due_date','is_completed','is_approved_by_client']
+        model=Tasks
+        fields="__all__"

@@ -21,7 +21,7 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('signup/',signup,name="signup"),
+    path('signup/',signup_view,name="signup"),
     path('', home,name="home"),
     path('login/', user_login, name='login'), # login
     path('logout/', custom_logout, name='logout'),
@@ -39,9 +39,9 @@ urlpatterns = [
     path('view-bids/',view_bids,name="view_bids"), # view bids
     path('accept-bid/<int:job_id>/',accept_bid,name="accept_bid"),   # accept bid
     path('accepted-bids/',accepted_bids,name="accepted_bids"),     # Accepted Bid
-    path('milestone/<int:job_id>/',add_milestone,name="milestone"),  # milestone Tracking
-    path('accept-milestone/',accept_milestone,name="accept_milestone"), # accept milestone
-    path('accepted-milestone/',accepted_milestone,name="accepted_milestone"), # accepted milestone
+    # path('milestone/<int:job_id>/',add_milestone,name="milestone"),  # milestone Tracking
+    # path('accept-milestone/',accept_milestone,name="accept_milestone"), # accept milestone
+    # path('accepted-milestone/',accepted_milestone,name="accepted_milestone"), # accepted milestone
     #freelancer
     path('freelancer-dashboard/',freelancer_dashboard,name='freelancer-dashboard'),
     path("chat/<int:job_id>/", chat_page, name="chat"), 

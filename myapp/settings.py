@@ -24,10 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-j+kjv$m8y-jw+8b5e+p!(lg%1a#x@x^umu7u6l(+b+br5s&pdy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['web-production-b82ed.up.railway.app', '127.0.0.1', 'localhost']
-CSRF_TRUSTED_ORIGINS = ['https://web-production-b82ed.up.railway.app']
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,7 +42,7 @@ INSTALLED_APPS = [
     
 ]
 
-AUTH_USER_MODEL = 'app.CustomUser'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -53,7 +52,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'myapp.urls'
@@ -76,20 +74,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myapp.wsgi.application'
 ASGI_APPLICATION = 'myapp.asgi.application'
-
-import dj_database_url
-DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get("DATABASE_URL"))
-}
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+AUTH_USER_MODEL='app.User'
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
+
 
 
 # Password validation
@@ -122,7 +118,6 @@ USE_I18N = True
 
 USE_TZ = True
 import os
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 

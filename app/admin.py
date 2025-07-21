@@ -1,8 +1,7 @@
 from django.contrib import admin
 from .models import *
-admin.site.register(Job)
-admin.site.register(Feedback)
-admin.site.register(Milestones)
+admin.site.register(Jobs)
+admin.site.register(Ratings)
 admin.site.register(Messages)
 
 
