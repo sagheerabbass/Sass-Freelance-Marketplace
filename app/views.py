@@ -25,10 +25,13 @@ def user_login(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
-        role = request.POST.get("role")  
+        role = request.POST.get("role")
+
         print("Login attempt:", username, password, role)
+
         user = authenticate(request, username=username, password=password)
-        print("Authenticated user:", user) 
+        print("Authenticated user:", user)
+
         if user is not None:
             if user.role == role:
                 login(request, user)
@@ -54,19 +57,19 @@ def Admin_dashboard(request):
          total_bids=Bids.objects.count()
          total_feedback_ratings=Ratings.objects.count()
          average_rating = Ratings.objects.aggregate(avg=Avg('rating'))['avg'] or 0
-         total_accepted_bids=Bids.objects.filter(accepted_at=True).count()
+        #  total_accepted_bids=Bids.objects.filter(accepted_at=True).count()
          total_freelancers=User.objects.filter(role='freelancer').count()
          total_budget=Jobs.objects.aggregate(total=models.Sum('budget'))['total']
          upcoming_deadlines=Jobs.objects.filter(deadline__isnull=False).count
          jobs=Jobs.objects.all()
          recent_activities=[]
-         recent_Bids=Bids.objects.order_by('created_at')[:2]
+         recent_Bids=Bids.objects.order_by('job_id')[:2]
          for bid in recent_Bids:
-             activity = f"Bid for  {bid.job.title} with deadline {bid.delivery_time} and amount (Rs {bid.bid_amount}) has created on {bid.created_at.strftime('%Y-%m-%d')}"
+             activity = f"Bid for  {bid.job.title} with deadline {bid.timeline} and amount (Rs {bid.bid_amount}) has created on {bid.timeline.strftime('%Y-%m-%d')}"
              recent_activities.append(activity)
-         recent_jobs=Jobs.objects.order_by('created_at')[:1]
+         recent_jobs=Jobs.objects.order_by('poster')[:1]
          for job in recent_jobs:
-             activity=f"Job {job.title} and description {job.description} and budget  {job.budget} has created at {job.created_at}"
+             activity=f"Job {job.title} and description {job.description} and budget  {job.budget} has created at {job.deadline}"
              recent_activities.append(activity)
          return render(request,"admin/admin_dashbaord.html",{
             'total_jobs': total_jobs,
@@ -75,7 +78,7 @@ def Admin_dashboard(request):
             'jobs':jobs,
             'total_bids':total_bids,
             'average_rating':average_rating,
-            'total_accepted_bids':total_accepted_bids,
+            # 'total_accepted_bids':total_accepted_bids,
             'total_feedback_ratings':total_feedback_ratings,
              'recent_activities':recent_activities,
             'upcoming_deadlines': upcoming_deadlines,})
@@ -103,24 +106,46 @@ def job_list(request):
     return render(request,"admin/jobs/job_list.html",data)
 @login_required
 def freelancer_dashboard(request):
-   if request.user.is_authenticated and request.user.is_freelancer():
-      jobs = Jobs.objects.filter(freelancer=request.user)
-      return render(request,"freelancer/freelancer_dashboard.html",{'jobs':jobs,})
-   return redirect('login')
+    if not request.user.is_freelancer():
+        return redirect('login')  # or show a 403 Forbidden
+
+    jobs = Jobs.objects.filter(freelancer=request.user)
+
+    return render(request, "freelancer/freelancer_dashboard.html", {'jobs': jobs})
 @login_required
-def Place_bid(request,job_id):
+def Place_bid(request, job_id):
+    print("🔹 Place_bid view called")
     job = get_object_or_404(Jobs, id=job_id)
-    if request.method=="POST":
-        form=Bidform(request.POST)
+    print(f"🔹 Found job: {job.title}")
+
+    # Check if user already bid
+    existing_bid = Bids.objects.filter(job=job, freelancer=request.user).first()
+    if existing_bid:
+        messages.warning(request, "You have already placed a bid on this job.")
+        return redirect('freelancer-dashboard')
+
+    if request.method == "POST":
+        print("🔹 POST request detected")
+        form = Bidform(request.POST)
         if form.is_valid():
-            bid=form.save(commit=False)
-            bid.job=job
-            bid.freelancer=request.user
+            print("✅ Form is valid")
+            bid = form.save(commit=False)
+            bid.job = job
+            bid.freelancer = request.user
             bid.save()
+            messages.success(request, "Bid placed successfully.")
             return redirect('freelancer-dashboard')
+        else:
+            print("❌ Form is invalid:", form.errors)
     else:
-        form=Bidform()
-    return render(request,"freelancer/Job/Place_biding.html",{'form':form,'job': job,})
+        print("🔸 GET request")
+
+    form = Bidform()
+    return render(request, "freelancer/Job/Place_biding.html", {
+        'form': form,
+        'job': job,
+    })
+
 def all_bids(request):
     total_bids=Bids.objects.all().filter(freelancer=request.user)
     return render(request,"freelancer/Job/my_bids.html",{'total_bids':total_bids})
@@ -131,22 +156,34 @@ def view_bids(request):
     return render(request,"admin/bids/view_bids.html",{'bids':bids})
 #Accept Bid
 @login_required
-def accept_bid(request,job_id):
-    job=get_object_or_404(Jobs,id=job_id)
-    bid=Bids.objects.filter(job=job).first()
-    if bid:
-        bid.accepted_at=True
+def accept_bid(request, job_id):
+    job = get_object_or_404(Jobs, id=job_id)
+    
+    if request.method == 'POST':
+        bid_id = request.POST.get('bid_id')
+        bid = get_object_or_404(Bids, id=bid_id, job=job)
+
+        # Check if a bid is already accepted for this job
+        existing_accepted = Bids.objects.filter(job=job, status='accepted').exists()
+        if existing_accepted:
+            messages.error(request, "This job has already been assigned to a freelancer.")
+            return redirect('view_bids', job_id=job.id)  # redirect with job id
+
+        # Accept the selected bid
+        bid.status = 'accepted'
         bid.save()
-        job.freelancer=bid.freelancer
-        bid.job.save()
-        messages.success(request,"You'r Bid is Accepted now and Assigned to a freelancer")
-        return redirect('view_bids')
-    else:
-         return redirect('view_bids')
+
+        job.freelancer = bid.freelancer
+        job.save()
+
+        messages.success(request, "Bid accepted and job assigned to freelancer.")
+    
+    bids = Bids.objects.filter(job=job)
+    return render(request, 'admin/bids/view_bids.html', {'job': job, 'bids': bids})
 #Accepted Bid
 @login_required
 def accepted_bids(request):
-    bids=Bids.objects.filter(accepted_at=True)
+    bids=Bids.objects.filter(status=True)
     return render(request, "admin/bids/accepted_bids.html", {'bids': bids})
 
 
@@ -161,8 +198,8 @@ def all_job_feedback_view(request):
         job_id = request.POST.get('job_id')
         job = get_object_or_404(Jobs, id=job_id)
 
-        # Check if feedback already exists
-        existing_feedback = Ratings.objects.filter(job=job, Given_by=request.user).first()
+        # Check if already given feedback
+        existing_feedback = Ratings.objects.filter(job_id=job, rated_by_user_id=request.user).first()
         if existing_feedback:
             messages.info(request, "You have already given feedback for this job.")
             return redirect('feedback-page')
@@ -170,9 +207,9 @@ def all_job_feedback_view(request):
         form = Feedbackform(request.POST)
         if form.is_valid():
             feedback = form.save(commit=False)
-            feedback.job = job
-            feedback.freelancer = job.freelancer
-            feedback.Given_by = request.user
+            feedback.job_id = job
+            feedback.rated_user_id = job.poster # assumes your `Jobs` model has a `freelancer` FK
+            feedback.rated_by_user_id = request.user
             feedback.save()
             messages.success(request, "Feedback submitted successfully!")
             return redirect('feedback-page')
@@ -182,8 +219,8 @@ def all_job_feedback_view(request):
     for job in jobs:
         job_feedback_data.append({
             'job': job,
-            'feedbacks': Ratings.objects.filter(job=job),
-            'already_given': Ratings.objects.filter(job=job, Given_by=request.user).exists()
+            'feedbacks': Ratings.objects.filter(job_id=job),
+            'already_given': Ratings.objects.filter(job_id=job, rated_by_user_id=request.user).exists()
         })
 
     return render(request, 'admin/feedback/feedback.html', {

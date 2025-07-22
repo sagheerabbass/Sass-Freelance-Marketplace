@@ -36,24 +36,24 @@
       </div>
 
       <!-- Delivery Time -->
+      <!-- Delivery Time -->
       <div>
         <label
-          for="delivery_time"
+          for="timeline"
           class="block text-sm font-medium text-gray-700 mb-1"
-          >Delivery Time (e.g. 5 days)</label
         >
+          Delivery Date
+        </label>
         <input
-          type="text"
-          name="delivery_time"
-          id="delivery_time"
+          type="date"
+          name="timeline"
+          id="timeline"
           required
           class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-400"
-          value="{{ form.delivery_time.value|default_if_none:'' }}"
+          value="{{ form.timeline.value|default_if_none:'' }}"
         />
-        {% if form.delivery_time.errors %}
-        <p class="text-red-500 text-sm mt-1">
-          {{ form.delivery_time.errors.0 }}
-        </p>
+        {% if form.timeline.errors %}
+        <p class="text-red-500 text-sm mt-1">{{ form.timeline.errors.0 }}</p>
         {% endif %}
       </div>
 

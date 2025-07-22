@@ -180,16 +180,6 @@
               >
                 <span>💬 Chat about this Job</span>
               </a>
-              <!-- Milestones Link -->
-              {% if job.id %}
-              <a
-                href="{% url 'milestone' job.id %}"
-                class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
-              >
-                <i class="fas fa-flag-checkered"></i>
-                <span>View/Add Milestones</span>
-              </a>
-              {% endif %}
             </div>
           </div>
           {% empty %}

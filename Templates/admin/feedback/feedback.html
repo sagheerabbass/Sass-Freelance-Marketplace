@@ -36,7 +36,7 @@
 
           <label>Feedback</label>
           <textarea
-            name="feedback"
+            name="comment"
             rows="3"
             class="w-full p-2 border rounded"
             required
@@ -49,11 +49,13 @@
             Submit Feedback
           </button>
         </form>
-        {% endif %} {% for fb in item.feedbacks %}
+        {% endif %}
+
+        {% for fb in item.feedbacks %}
         <div class="mt-2 border-t pt-2 text-sm text-gray-700">
           <strong>Rating:</strong> ⭐ {{ fb.rating }}<br />
-          <strong>By:</strong> {{ fb.Given_by.username }}<br />
-          <strong>Feedback:</strong> {{ fb.feedback }}
+          <strong>By:</strong> {{ fb.rated_by_user_id.username }}<br />
+          <strong>Feedback:</strong> {{ fb.comment }}
         </div>
         {% endfor %}
       </div>
