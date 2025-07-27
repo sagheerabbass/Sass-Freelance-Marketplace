@@ -19,7 +19,6 @@ class jobform(forms.ModelForm):
     class Meta:
         model=Jobs
         exclude = ['posted_by']
-        fields='__all__'
 class Bidform(forms.ModelForm):
     class Meta:
         model=Bids

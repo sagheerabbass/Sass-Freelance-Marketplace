@@ -30,13 +30,15 @@ urlpatterns = [
     #post job
     path('job_post/',job_posting,name="job_post"),  # post a job 
     path('job_list/',job_list,name="job_list"),    #  job listing
+    path('jobs/edit/<int:job_id>/', edit_job, name='edit-job'),
+    path('jobs/delete/<int:job_id>/', delete_job, name='delete-job'),
     path('job-bid/<int:job_id>/', Place_bid, name='job_bid'),   # job bidding 
     path('my-bid/',all_bids,name="my_bid"),  # my bids
     # path('feedback-rating/',feeback_list_view,name="feedback_rating"),  # Feedback
     # path('submit-feeback/<int:job_id>/',Feedback_rating,name='submit_feedback'),
     # # submit Feedback
     path("feedbacks/",all_job_feedback_view, name="feedback-page"),
-    path('view-bids/',view_bids,name="view_bids"), # view bids
+    path('view-bids/', view_bids, name="view_bids"), # view bids
     path('accept-bid/<int:job_id>/',accept_bid,name="accept_bid"),   # accept bid
     path('accepted-bids/',accepted_bids,name="accepted_bids"),     # Accepted Bid
     # path('milestone/<int:job_id>/',add_milestone,name="milestone"),  # milestone Tracking

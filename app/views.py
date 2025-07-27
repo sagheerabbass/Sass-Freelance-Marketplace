@@ -57,7 +57,7 @@ def Admin_dashboard(request):
          total_bids=Bids.objects.count()
          total_feedback_ratings=Ratings.objects.count()
          average_rating = Ratings.objects.aggregate(avg=Avg('rating'))['avg'] or 0
-        #  total_accepted_bids=Bids.objects.filter(accepted_at=True).count()
+         total_accepted_bids=Bids.objects.filter(status='accepted').count()
          total_freelancers=User.objects.filter(role='freelancer').count()
          total_budget=Jobs.objects.aggregate(total=models.Sum('budget'))['total']
          upcoming_deadlines=Jobs.objects.filter(deadline__isnull=False).count
@@ -78,7 +78,7 @@ def Admin_dashboard(request):
             'jobs':jobs,
             'total_bids':total_bids,
             'average_rating':average_rating,
-            # 'total_accepted_bids':total_accepted_bids,
+            'total_accepted_bids':total_accepted_bids,
             'total_feedback_ratings':total_feedback_ratings,
              'recent_activities':recent_activities,
             'upcoming_deadlines': upcoming_deadlines,})
@@ -94,22 +94,42 @@ def job_posting(request):
             job.posted_by= request.user
             job.save()
             return redirect('job_list')
+        else:
+           print(form.errors)
     else:
         form=jobform()
     return render(request,"admin/jobs/job_posting.html",{'form':form})
 @login_required
 def job_list(request):
-    all_jobs=Jobs.objects.all()
-    data={
-        'all_jobs':all_jobs,
-    }
-    return render(request,"admin/jobs/job_list.html",data)
+    all_jobs = Jobs.objects.all()
+    return render(request, "admin/jobs/job_list.html", {'all_jobs': all_jobs})
+
+def edit_job(request, job_id):
+    job = get_object_or_404(Jobs, id=job_id)
+    
+    if request.method == 'POST':
+        form = jobform(request.POST, instance=job)
+        if form.is_valid():
+            print("Assigned Freelancer:", form.cleaned_data['freelancer'])
+            form.save()
+            return redirect('job_list')
+    else:
+        form = jobform(instance=job)
+
+    return render(request, 'admin/jobs/edit_job.html', {'form': form, 'job': job})
+
+def delete_job(request, job_id):
+    job = get_object_or_404(Jobs, id=job_id)
+    if request.method == 'POST':
+        job.delete()
+        messages.success(request, "Job deleted successfully!")
+        return redirect('job_list')
 @login_required
 def freelancer_dashboard(request):
     if not request.user.is_freelancer():
-        return redirect('login')  # or show a 403 Forbidden
+        return redirect('login')  
 
-    jobs = Jobs.objects.filter(freelancer=request.user)
+    jobs = Jobs.objects.all()
 
     return render(request, "freelancer/freelancer_dashboard.html", {'jobs': jobs})
 @login_required
@@ -152,40 +172,32 @@ def all_bids(request):
 # view bids
 @login_required
 def view_bids(request):
-    bids=Bids.objects.all()
-    return render(request,"admin/bids/view_bids.html",{'bids':bids})
+    bids = Bids.objects.select_related('job', 'freelancer').order_by('-status', '-id')
+    is_any_bid_accepted = bids.filter(status='accepted').exists()
+    return render(request,"admin/bids/view_bids.html",{'bids':bids,'is_any_bid_accepted': is_any_bid_accepted,})
 #Accept Bid
 @login_required
 def accept_bid(request, job_id):
-    job = get_object_or_404(Jobs, id=job_id)
-    
-    if request.method == 'POST':
-        bid_id = request.POST.get('bid_id')
-        bid = get_object_or_404(Bids, id=bid_id, job=job)
+    if request.method == "POST":
+        bid_id = request.POST.get("bid_id")
+        job = get_object_or_404(Jobs, id=job_id)
+        selected_bid = get_object_or_404(Bids, id=bid_id, job=job)
 
-        # Check if a bid is already accepted for this job
-        existing_accepted = Bids.objects.filter(job=job, status='accepted').exists()
-        if existing_accepted:
-            messages.error(request, "This job has already been assigned to a freelancer.")
-            return redirect('view_bids', job_id=job.id)  # redirect with job id
+        # Set all bids for this job to 'pending'
+        Bids.objects.filter(job=job).exclude(id=selected_bid.id).update(status="pending")
 
         # Accept the selected bid
-        bid.status = 'accepted'
-        bid.save()
+        selected_bid.status = "accepted"
+        selected_bid.save()
 
-        job.freelancer = bid.freelancer
-        job.save()
-
-        messages.success(request, "Bid accepted and job assigned to freelancer.")
-    
-    bids = Bids.objects.filter(job=job)
-    return render(request, 'admin/bids/view_bids.html', {'job': job, 'bids': bids})
+        messages.success(request, "Bid has been accepted successfully.")
+        return redirect("view_bids")  # or whatever URL name you're using
 #Accepted Bid
 @login_required
-def accepted_bids(request):
-    bids=Bids.objects.filter(status=True)
-    return render(request, "admin/bids/accepted_bids.html", {'bids': bids})
 
+def accepted_bids(request):
+    bids = Bids.objects.filter(status='accepted').select_related('freelancer', 'job')
+    return render(request, 'admin/bids/accepted_bids.html', {'bids': bids})
 
 # Feedback & Rating
 

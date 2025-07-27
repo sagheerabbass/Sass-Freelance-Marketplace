@@ -5,38 +5,90 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-gray-100 min-h-screen p-6">
-    <h1 class="text-4xl font-bold text-center">All Jobs</h1>
-    <br />
-    <!-- Job Cards -->
-    <div class="grid gap-4">
-      {% for job in all_jobs %}
-      <div class="bg-white p-6 rounded shadow-md">
-        <h2 class="text-xl font-semibold text-gray-800">{{ job.title }}</h2>
-        <p class="text-gray-600 mt-2">
-          {{ job.description|truncatechars:150 }}
-        </p>
-        <div class="mt-4 flex justify-between text-sm text-gray-500">
-          <span>Budget: PKR {{ job.budget }}</span>
-          <span>Deadline: {{ job.deadline }}</span>
-        </div>
-        <a
-          href="{% url 'chat' job.id %}"
-          class="mt-2 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          💬 Chat with Freelancer
-        </a>
-      </div>
-      {% empty %}
-      <p class="text-gray-600">No jobs have been posted yet.</p>
-      {% endfor %}
+    <h1 class="text-4xl font-bold text-center mb-2">All Jobs</h1>
+
+    <!-- Job Post button -->
+    <div class="flex justify-center mb-8">
+      <a
+        href="{% url 'job_post' %}"
+        class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
+      >
+        ➕ Post Job
+      </a>
     </div>
-    <br />
-    <div class="mt-auto flex justify-center">
+
+    <div class="overflow-x-auto">
+      {% if all_jobs %}
+      <table class="min-w-full bg-white rounded shadow-md">
+        <thead>
+          <tr class="bg-gray-200 text-gray-700 text-left text-sm">
+            <th class="py-3 px-4">Title</th>
+            <th class="py-3 px-4">Description</th>
+            <th class="py-3 px-4">Budget (PKR)</th>
+            <th class="py-3 px-4">Deadline</th>
+            <th class="py-3 px-4">Freelancer</th>
+            <th class="py-3 px-4">Status</th>
+            <th class="py-3 px-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for job in all_jobs %}
+          <tr class="border-b text-sm text-gray-800 hover:bg-gray-50">
+            <td class="py-3 px-4 font-medium">{{ job.title }}</td>
+            <td class="py-3 px-4">{{ job.description|truncatechars:100 }}</td>
+            <td class="py-3 px-4">{{ job.budget }}</td>
+            <td class="py-3 px-4">{{ job.deadline }}</td>
+            <td class="py-3 px-4">
+              {% if job.freelancer %}
+                {{ job.freelancer.username }}
+              {% else %}
+                <span class="text-gray-400 italic">Unassigned</span>
+              {% endif %}
+            </td>
+            <td class="py-3 px-4 capitalize">
+              <span class="inline-block px-2 py-1 rounded text-white text-xs
+                {% if job.status == 'open' %}
+                  bg-green-500
+                {% elif job.status == 'assigned' %}
+                  bg-yellow-500
+                {% elif job.status == 'completed' %}
+                  bg-blue-500
+                {% else %}
+                  bg-gray-400
+                {% endif %}
+              ">
+                {{ job.status }}
+              </span>
+            </td>
+            <td class="py-3 px-4 space-x-2">
+              <a href="{% url 'chat' job.id %}" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-xs">
+                💬 Chat
+              </a>
+              <a href="{% url 'edit-job' job.id %}" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-xs">
+                ✏️ Edit
+              </a>
+              <form action="{% url 'delete-job' job.id %}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this job?');">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs">
+                  🗑️ Delete
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <p class="text-gray-600 text-center">No jobs have been posted yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="mt-10 flex justify-center">
       <a
         href="{% url 'admin-dashboard' %}"
         class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
       >
-        Back to Admin Dashboard
+        ← Back to Admin Dashboard
       </a>
     </div>
   </body>
