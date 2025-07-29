@@ -173,8 +173,11 @@ def all_bids(request):
 @login_required
 def view_bids(request):
     bids = Bids.objects.select_related('job', 'freelancer').order_by('-status', '-id')
-    is_any_bid_accepted = bids.filter(status='accepted').exists()
-    return render(request,"admin/bids/view_bids.html",{'bids':bids,'is_any_bid_accepted': is_any_bid_accepted,})
+    accepted_bid_job_ids = set(bids.filter(status='accepted').values_list('job_id', flat=True))
+    return render(request, "admin/bids/view_bids.html", {
+        'bids': bids,
+        'accepted_bid_job_ids': accepted_bid_job_ids,
+    })
 #Accept Bid
 @login_required
 def accept_bid(request, job_id):
@@ -182,16 +185,15 @@ def accept_bid(request, job_id):
         bid_id = request.POST.get("bid_id")
         job = get_object_or_404(Jobs, id=job_id)
         selected_bid = get_object_or_404(Bids, id=bid_id, job=job)
-
-        # Set all bids for this job to 'pending'
         Bids.objects.filter(job=job).exclude(id=selected_bid.id).update(status="pending")
-
-        # Accept the selected bid
         selected_bid.status = "accepted"
         selected_bid.save()
+        job.status = "assigned"
+        job.freelancer = selected_bid.freelancer
+        job.save()
 
-        messages.success(request, "Bid has been accepted successfully.")
-        return redirect("view_bids")  # or whatever URL name you're using
+        messages.success(request, "Bid has been accepted and job assigned successfully.")
+        return redirect("view_bids")
 #Accepted Bid
 @login_required
 
@@ -240,35 +242,6 @@ def all_job_feedback_view(request):
         'form': form,
     })
 @login_required
-# def add_milestone(request,job_id):
-#     job=get_object_or_404(Jobs,id=job_id)
-#     all_milestones=Milestones.objects.filter(job=job)
-#     if request.method=="POST":
-#         form=Milestonesform(request.POST)
-#         if form.is_valid():
-#             milestone=form.save(commit=False)
-#             milestone.job=job
-#             milestone.save()
-#             return redirect('milestone',job_id=job.id)
-#     else:
-#         form=Milestonesform()
-#         return render(request,"freelancer/milestone/milestones.html",{'form':form,'job':job,'all_milestones':all_milestones})  
-@login_required
-# def accept_milestone(request):
-#     if request.method=="POST":
-#         milestone_id=request.POST.get("milestone_id")
-#         milestone=get_object_or_404(Milestones,id=milestone_id)
-#         milestone.is_approved_by_client=True
-#         milestone.save()
-#         messages.success(request,"Milestone Approved Successfully!")
-
-#     completed_milestone=Milestones.objects.all()
-#     return render(request,"admin/milestones/accept_milestone.html",{'completed_milestone': completed_milestone})
-# @login_required 
-# def accepted_milestone(request):
-#     all_milestone=Milestones.objects.filter(is_approved_by_client=True)
-#     return render (request,"admin/milestones/accepted_milestone.html",{'all_milestone':all_milestone})
-@login_required
 def chat_page(request,job_id):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -303,7 +276,67 @@ def job_completion_certificate(request,job_id):
     p.save()
     return response
 @login_required
-def job_completion_list(request,):
+def job_completion_list(request):
     jobs=Jobs.objects.filter(freelancer=request.user)
-    return render(request,"job_completion_certificate",{'jobs':jobs})
+    return render(request,"job_completion_certificate.html",{'jobs':jobs})
+@login_required
+def assigned_tasks(request):
+    print("Current user:", request.user)
+    job=Jobs.objects.filter(status='assigned',freelancer=request.user)
+    return render(request,'Assigned_jobs.html',{'job':job})
+@login_required
+def update_job_status(request, job_id):
+    job = get_object_or_404(Jobs, id=job_id)
+
+    # Only the assigned freelancer can update
+    if job.freelancer != request.user:
+        messages.error(request, "You are not allowed to update this job.")
+        return redirect('freelancer-dashboard')
+
+    if request.method == 'POST':
+        job.status = 'completed'
+        job.save()
+        messages.success(request, f"Job '{job.title}' marked as completed.")
+        return redirect('freelancer-dashboard')
+
+    return render(request, 'freelancer/Job/update_status.html', {'job': job})
+
+@login_required
+def recieve_feedback(request):
+    freelancer = request.user
+
+    # Get only jobs assigned to this freelancer
+    assigned_jobs = Jobs.objects.filter(freelancer=freelancer)
+
+    job_feedback_data = []
+    for job in assigned_jobs:
+        feedbacks = Ratings.objects.filter( job_id= job)
+        already_given = feedbacks.exists()
+        job_feedback_data.append({
+            'job': job,
+            'feedbacks': feedbacks,
+            'already_given': already_given,
+        })
+
+    return render(request, 'freelancer/feedback and ratings/feedback.html', {
+        'job_feedback_data': job_feedback_data
+    })
+@login_required
+def upload_work_list(request):
+    assigned_jobs = Jobs.objects.filter(freelancer=request.user, status='assigned')
+    return render(request, 'freelancer/upload_work.html', {'assigned_jobs': assigned_jobs})
+@login_required
+def upload_work_action(request, job_id):
+    if request.method == 'POST':
+        file = request.FILES.get('completed_file')
+        notes = request.POST.get('notes')
+        job = Jobs.objects.get(id=job_id, freelancer=request.user)
+
+        job.completed_file = file
+        job.completion_notes = notes
+        job.status = 'Completed'
+        job.save()
+
+        messages.success(request, "Work uploaded successfully.")
+        return redirect('upload_completed_work')
 # Create your views here.

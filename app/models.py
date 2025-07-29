@@ -38,6 +38,7 @@ class Jobs(models.Model):
     poster = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='posted_jobs')
     freelancer = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,null=True,blank=True,related_name='assigned_jobs',
         limit_choices_to={'role': 'freelancer'})
+    completed_file = models.FileField(upload_to='completed_work/', null=True, blank=True)
 class Bids(models.Model):
     job=models.ForeignKey(Jobs,on_delete=models.CASCADE)
     freelancer = models.ForeignKey(User, on_delete=models.CASCADE)

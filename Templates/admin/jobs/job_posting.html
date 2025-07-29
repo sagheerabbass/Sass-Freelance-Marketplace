@@ -55,6 +55,17 @@
             {% if form.category.errors %}
                 <p class="text-red-500 text-sm">{{ form.category.errors.0 }}</p>
             {% endif %}
+            <!-- Status -->
+<label for="id_status" class="block font-medium mt-4 mb-1">Status</label>
+<select name="status" id="id_status"
+        class="w-full border-2 border-sky-400 rounded-md px-3 py-2 bg-white mb-2">
+    {% for val, label in form.fields.status.choices %}
+        <option value="{{ val }}" {% if form.status.value == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+</select>
+{% if form.status.errors %}
+    <p class="text-red-500 text-sm">{{ form.status.errors.0 }}</p>
+{% endif %}
 
             <!-- Buttons -->
             <div class="flex flex-col items-center gap-4 mt-6">

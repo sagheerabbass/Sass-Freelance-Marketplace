@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Feedback and Ratings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen p-10">
+    <div class="max-w-5xl mx-auto">
+      <h1 class="text-3xl font-bold text-center text-gray-800 mb-10">
+        Feedback You've Received
+      </h1>
+
+      {% if job_feedback_data %}
+        {% for item in job_feedback_data %}
+        <div class="bg-white shadow p-4 rounded mb-4">
+          <h2 class="text-xl font-bold text-blue-700">{{ item.job.title }}</h2>
+          <p class="text-gray-600">{{ item.job.description }}</p>
+
+          {% if item.already_given %}
+            <p class="text-green-600 mt-2 font-semibold">
+              ✅ Feedback received
+            </p>
+          {% else %}
+            <p class="text-red-500 mt-2 font-semibold">
+              ❌ No feedback yet
+            </p>
+          {% endif %}
+
+          {% for fb in item.feedbacks %}
+          <div class="mt-2 border-t pt-2 text-sm text-gray-700">
+            <strong>Rating:</strong> ⭐ {{ fb.rating }}<br />
+            <strong>By:</strong> {{ fb.rated_by_user_id }}<br />
+            <strong>Feedback:</strong> {{ fb.comment }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-center text-gray-500">You haven't received any feedback yet.</p>
+      {% endif %}
+
+      <div class="text-center mt-10">
+        <a href="{% url 'freelancer-dashboard' %}" class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700">
+          ← Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

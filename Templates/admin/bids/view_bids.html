@@ -5,66 +5,37 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-gray-100 min-h-screen p-10">
-    <!-- ✅ Message block for flash messages -->
-    {% if messages %}
-    <div class="mb-4 max-w-xl mx-auto">
-      {% for message in messages %}
-      <div
-        class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-2"
-      >
-        {{ message }}
-      </div>
-      {% endfor %}
-    </div>
-    {% endif %}
 
     <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">All Bids</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-{% comment %} First, check if any bid has been accepted {% endcomment %}
-{% with accepted_bid=None %}
-  {% for b in bids %}
-    {% if b.status == "accepted" %}
-      {% with accepted_bid=b %}
-        {% break %}
-      {% endwith %}
-    {% endif %}
-  {% endfor %}
+      {% for bid in bids %}
+        <div class="bg-white p-6 rounded shadow-md">
+          <h2 class="text-xl font-semibold text-indigo-600 mb-2">{{ bid.job.title }}</h2>
 
-  {% for bid in bids %}
-    <div class="bg-white p-4 rounded shadow-md mb-4">
-      <p class="font-semibold">Freelancer: {{ bid.freelancer.username }}</p>
-      <p>Bid Amount: {{ bid.amount }}</p>
-      <p>Bid Description: {{ bid.description }}</p>
+          <p><strong>Freelancer:</strong> {{ bid.freelancer.username }}</p>
+          <p><strong>Bid Amount:</strong> ${{ bid.bid_amount }}</p>
+          <p><strong>Message:</strong> {{ bid.message }}</p>
 
-      {% if bid.status == "accepted" %}
-        <p class="text-green-500 font-bold mt-2">✅ Accepted</p>
-
-      {% elif accepted_bid %}
-        <p class="text-gray-400 mt-2">Bid already accepted</p>
-
-      {% else %}
-        <form method="post" action="{% url 'accept_bid' bid.job.id %}">
-          {% csrf_token %}
-          <input type="hidden" name="bid_id" value="{{ bid.id }}">
-          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2">
-            Accept Bid
-          </button>
-        </form>
-      {% endif %}
-    </div>
-  {% endfor %}
-{% endwith %}
-
-
-
+          {% if bid.status == "accepted" %}
+            <p class="text-green-600 font-bold mt-4">✅ Accepted</p>
+          {% elif bid.job.id in accepted_bid_job_ids and bid.status != "accepted" %}
+             <p class="text-gray-400 mt-4">Bid already accepted</p>
+          {% else %}
+            <form method="post" action="{% url 'accept_bid' bid.job.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="bid_id" value="{{ bid.id }}">
+              <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-4 w-full">
+                Accept Bid
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      {% endfor %}
     </div>
 
-    <div class="mt-8 text-center">
-      <a
-        href="{% url 'admin-dashboard' %}"
-        class="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
-      >
+    <div class="mt-10 text-center">
+      <a href="{% url 'admin-dashboard' %}" class="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
         Back to Dashboard
       </a>
     </div>

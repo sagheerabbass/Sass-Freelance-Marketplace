@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Completed Work</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-5xl mx-auto">
+    <h1 class="text-3xl font-bold text-center mb-8">Upload Work for Assigned Jobs</h1>
+
+    {% if assigned_jobs %}
+      {% for job in assigned_jobs %}
+      <div class="bg-white p-4 rounded shadow mb-4">
+        <h2 class="text-xl font-semibold">{{ job.title }}</h2>
+        <p class="text-gray-600">{{ job.description }}</p>
+
+        <form action="{% url 'upload_work_action' job.id %}" method="POST" enctype="multipart/form-data" class="mt-4">
+          {% csrf_token %}
+          <input type="file" name="completed_file" required class="block mb-2" />
+          <textarea name="notes" placeholder="Notes (optional)" class="block w-full border p-2 mb-2"></textarea>
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Upload Work
+          </button>
+        </form>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-center text-gray-600">No jobs assigned to you currently.</p>
+    {% endif %}
+  </div>
+  <div class="mt-4 flex justify-center">
+        <a
+          href="{% url 'freelancer-dashboard' %}"
+          class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition"
+        >
+          Back to Freelancer Dashboard
+        </a>
+      </div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assigned Tasks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 p-6 min-h-screen">
+    <div class="max-w-5xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center text-indigo-700">Your Assigned Tasks</h1>
+
+        {% if job %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for j in job %}
+                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition">
+                        <h2 class="text-xl font-semibold text-indigo-600">{{ j.title }}</h2>
+                        <p class="text-gray-700 mt-2">{{ j.description }}</p>
+
+                        <div class="mt-4 text-sm text-gray-600 space-y-1">
+                            <p><strong>Category:</strong> {{ j.category }}</p>
+                            <p><strong>Budget:</strong> ${{ j.budget }}</p>
+                            <p><strong>Deadline:</strong> {{ j.deadline|date:"F j, Y" }}</p>
+                            <p><strong>Status:</strong> {{ j.status|capfirst }}</p>
+                            <p><strong>Posted By:</strong> {{ j.poster.username }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center text-gray-500 text-lg mt-10">You have no assigned tasks at the moment.</p>
+        {% endif %}
+    </div>
+    <div class="text-center mt-10">
+      <a
+        href="{% url 'freelancer-dashboard' %}"
+        class="text-blue-600 hover:underline"
+      >
+        ← Back to Dashboard
+      </a>
+    </div>
+</body>
+</html>
