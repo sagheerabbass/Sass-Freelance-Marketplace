@@ -22,29 +22,32 @@ def signup_view(request):
 
     return render(request, 'authentication/signup.html', {'form': form})
 def user_login(request):
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        role = request.POST.get("role")
-
-        print("Login attempt:", username, password, role)
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
         user = authenticate(request, username=username, password=password)
-        print("Authenticated user:", user)
-
         if user is not None:
-            if user.role == role:
-                login(request, user)
-                if role == "admin":
-                    return redirect('admin-dashboard')
-                elif role == "freelancer":
-                    return redirect('freelancer-dashboard')
+            login(request, user)
+            role = getattr(user, 'role', None) 
+            print(f"Authenticated user: {user.username}, Role: {role}")
+
+            # Normalize role for comparison
+            if role:
+                role = role.lower().strip()
+
+            if role == 'admin':
+                return redirect('admin-dashboard')  
+            elif role == 'freelancer':
+                return redirect('freelancer-dashboard')
             else:
-                messages.error(request, "Incorrect role selected.")
+                messages.error(request, "No dashboard found for your role.")
+                return redirect('login')  # or some default page
+
         else:
             messages.error(request, "Invalid username or password.")
 
-    return render(request, "authentication/login.html")
+    return render(request, 'authentication/login.html')
 def custom_logout(request):
     logout(request)  
     return redirect('login')
